@@ -1,8 +1,9 @@
-%% kraft beroende av L_s
+
+% kraft beroende av L_s
 clf
 clc
 L_s=linspace(0,1,100);
-K_ts = [1 0.7 0.5 0.3 0.1]; %tand/slot förhållande
+K_ts = [1/2]%[1 0.7 0.5 0.3 0.1]; %tand/slot förhållande
 
 f1=10;% frekvens fixerat vid 10Hz
 u_0=4*pi*10^-7;
@@ -10,7 +11,7 @@ w=2*pi*f1; % elektrisk vinkelfrekvens?
 K_ta=1; % anta att transverse effects ?r f?rsumbara. sida 86 LMES
 s=1; %slip
 p=4;
-K_w=0.9;
+K_w=0.5;
 sigma_i=0;
 delta_i=0.03;
 K_ti=1;
@@ -22,10 +23,13 @@ g=g_e;
 tau=@(L_s)L_s./p; % pole pitch, kolla s? den ?r konsistent med boken
 sigma_e=sigma*((1/K_ta)+((sigma_i*delta_i)/(sigma*K_ti*d_a)));
 I_1=10;
+x=@(L_s)(L_s./(13+14*K_ts(i)));
 for i=1: length(K_ts)
-    N=@(L_s) (L_s./(12+13*K_ts(i))).*(0.025/(pi*(0.001^2)));
+    N=@(L_s) (L_s./(13+14*K_ts(i))).*(0.05/(pi*(0.001^2)));
     G_e=@(L_s)(u_0.*w.*(tau(L_s).^2).*sigma_e.*d_a)/((pi^2).*g_e); % goodness factor
     X_m=@(L_s)(6.*u_0.*w.*tau(L_s).*L_s./(p.*g.*pi^2)).*(K_w.*N(L_s)).^2; % magnetiseringsreakktans
+    % Försvinner inte statorbredden i Xm? Jmf. andra ekv...
+    
     R_2=@(L_s) X_m(L_s)./G_e(L_s); % rotorresistans
 
     F_x=@(L_s) 3.*(I_1.^2).*R_2(L_s)./((s.*2.*tau(L_s).*f1).*((1./s.*G_e(L_s).^2+1)));
@@ -33,12 +37,12 @@ for i=1: length(K_ts)
     plot(L_s,F_x(L_s));
 end
 
-%plot(0.37,F_x(0.37),'-x','linewidth',1)
-axis([0,1,0,200])
+plot(0.37,F_x(0.37),'-x','linewidth',1)
+axis([0,1,0,500])
 ylabel('Thrust [N]');
 xlabel('statorlängd [m]');
 grid on
-
+F_x(0.37)
 %% test testsson
 clear all
 m=3; %antal faser
