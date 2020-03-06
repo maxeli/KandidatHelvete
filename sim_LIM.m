@@ -1,16 +1,19 @@
-%% kraft beroende av L_s
+% kraft beroende av L_s
 clf
 clc
 L_s=linspace(0,1,100);
-K_ts = [1 0.7 0.5 0.3 0.1]; %tand/slot förhållande
+K_ts = [2 1/2];%[1 0.7 0.5 0.3 0.1]; %tand/slot förhållande
 
 f1=10;% frekvens fixerat vid 10Hz
 u_0=4*pi*10^-7;
 w=2*pi*f1; % elektrisk vinkelfrekvens?
+
+Wse = 0.03; %statorbredd.
+
 K_ta=1; % anta att transverse effects ?r f?rsumbara. sida 86 LMES
 s=1; %slip
 p=4;
-K_w=0.9;
+K_w=0.6;
 sigma_i=0;
 delta_i=0.03;
 K_ti=1;
@@ -21,23 +24,68 @@ g_0=g_e;
 g=g_e;
 tau=@(L_s)L_s./p; % pole pitch, kolla s? den ?r konsistent med boken
 sigma_e=sigma*((1/K_ta)+((sigma_i*delta_i)/(sigma*K_ti*d_a)));
-I_1=10;
+I_1=16;
+x=@(L_s)(L_s./(13+14*K_ts(i)));
 for i=1: length(K_ts)
-    N=@(L_s) (L_s./(12+13*K_ts(i))).*(0.025/(pi*(0.001^2)));
+    N=@(L_s) (L_s./(13+14*K_ts(i))).*(0.05/(pi*(0.001^2)));
     G_e=@(L_s)(u_0.*w.*(tau(L_s).^2).*sigma_e.*d_a)/((pi^2).*g_e); % goodness factor
-    X_m=@(L_s)(6.*u_0.*w.*tau(L_s).*L_s./(p.*g.*pi^2)).*(K_w.*N(L_s)).^2; % magnetiseringsreakktans
+    X_m=@(L_s)(6.*u_0.*w.*Wse.*tau(L_s).*L_s.*(K_w.*N(L_s)).^2.)/(p.*g.*pi^2); % magnetiseringsreakktans
+    % Försvinner inte statorbredden i Xm? Jmf. andra ekv...
+    
     R_2=@(L_s) X_m(L_s)./G_e(L_s); % rotorresistans
-
     F_x=@(L_s) 3.*(I_1.^2).*R_2(L_s)./((s.*2.*tau(L_s).*f1).*((1./s.*G_e(L_s).^2+1)));
     hold on
-    plot(L_s,F_x(L_s));
+        if i==1
+            plot(L_s,F_x(L_s),'g');
+        elseif i == 2
+            plot(L_s,F_x(L_s),'-.b');
+        end
+    %plot(0.4,F_x(0.4),'-x','linewidth',1)
+
 end
 
-%plot(0.37,F_x(0.37),'-x','linewidth',1)
-axis([0,1,0,200])
+axis([0,1,0,15])
 ylabel('Thrust [N]');
 xlabel('statorlängd [m]');
+legend('K_{ts} 2:1','K_{ts} 1:2');
 grid on
+F_x(0.4);
+
+%%
+clf
+clc
+L_s = linspace(0,1,100);
+K_ts = 3/4; %tand:slot faktor
+
+Wse = 0.03; %statorbredd.
+
+
+
+K_w = 0.6; %lindningsfaktor
+
+x =@(L_s)(L_s./(13+14*K_ts));
+
+N =@(L_s) (x(L_s).*0.05.*K_w)./(2.*pi.*(0.0005^2));
+L_t =@(L_s) N(L_s).*2.*(Wse+x(L_s)).*12;
+plot(L_s,L_t(L_s))
+grid on, hold on
+% plot(L_s,N(L_s))
+axis([0 0.5 0 700])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %% test testsson
 clear all
