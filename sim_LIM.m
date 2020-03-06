@@ -51,6 +51,41 @@ legend('K_{ts} 2:1','K_{ts} 1:2');
 grid on
 F_x(0.4);
 
+%%
+clf
+clc
+L_s = linspace(0,1,100);
+K_ts = 3/4; %tand:slot faktor
+
+Wse = 0.03; %statorbredd.
+
+
+
+K_w = 0.6; %lindningsfaktor
+
+x =@(L_s)(L_s./(13+14*K_ts));
+
+N =@(L_s) (x(L_s).*0.05.*K_w)./(2.*pi.*(0.0005^2));
+L_t =@(L_s) N(L_s).*2.*(Wse+x(L_s)).*12;
+plot(L_s,L_t(L_s))
+grid on, hold on
+% plot(L_s,N(L_s))
+axis([0 0.5 0 700])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %% test testsson
 clear all
