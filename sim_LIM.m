@@ -5,17 +5,17 @@ L_s=linspace(0,1,100);
 K_ts = [2 1/2];%[1 0.7 0.5 0.3 0.1]; %tand/slot f�rh�llande
 
 f1=10;% frekvens fixerat vid 10Hz
-u_0=4*pi*10^-7;
+u_0=4*pi*10^-7; % Permabilitet i vakum
 w=2*pi*f1; % elektrisk vinkelfrekvens?
 
 Wse = 0.03; %statorbredd.
 
-K_ta=1; % anta att transverse effects ?r f?rsumbara. sida 86 LMES
-s=1; %slip
-p=4;
-K_w=0.6;
-sigma_i=0;
-delta_i=0.03;
+K_ta=1; % anta att transverse effects är försumbara. sida (86 LMES)
+s=1; % Slip (På grud av låg hastighet försummar vi slip)
+p=4; % Poler
+K_w=0.6; % Lindningfaktor (Hur mycket av våran grundton som kommer igenom, denna är nog king 0.5 för ekonomiska konfiguraitoner)
+sigma_i=0; % [1/(ohm*meter)] Järnets elektriska ledningsförmåga (89 LMES) 
+delta_i=0.03; % 
 K_ti=1;
 d_a=0.003;
 sigma=37.7*10^6;
@@ -86,6 +86,10 @@ axis([0 0.5 0 700])
 
 
 
+
+b = uicontrol('Parent',figure,'Style','slider','Position',[81,54,419,23],...
+              'value', 0.5, 'min',0, 'max',1);
+b.Callback = @(es,ed) plot(L_s,F_x(L_s)); 
 
 %% test testsson
 clear all
@@ -164,7 +168,7 @@ t_yoke=0.025;
 t_stator=0.03;
 A_rals=0.01*t_stator; 
 u0=4*pi*10^-7;
-u_rals= 200*u0; 
+u_rals= 200*u0; % Permabilitet i rälsen
 tau=Ls/p;
 u_core=4000*u0;
 A_yoke=t_stator*t_yoke;
@@ -205,7 +209,7 @@ P_cu=I_1^2*R_cu;
 
 
 %% Kraft beroende av frekvensen
-L_s=0.33; %statorl�ngd
+L_s=0.33; %statorl�ngd
 N=((36/(49*12))*(25/pi)).*(L_s)*1000;
 f1=linspace(0,10,100);% frekvens
 u_0=4*pi*10^-7;
